@@ -177,16 +177,42 @@ BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
 
 # --- Model Loading ---
 @st.cache_resource
+# def load_classifier(model_path="review_classifier.pth"):
+#     # Initialize the model with the same configuration as training
+#     model = GPTModel(BASE_CONFIG)
+#     num_classes = 2 # Assuming binary classification as in your notebook
+#     model.out_head = torch.nn.Linear(in_features=BASE_CONFIG["emb_dim"], out_features=num_classes)
+
+#     # Load the state dictionary
+#     model_state_dict = torch.load(model_path, map_location=torch.device('cpu')) # Load to CPU
+#     model.load_state_dict(model_state_dict)
+#     model.eval() # Set the model to evaluation mode
+#     return model
 def load_classifier(model_path="review_classifier.pth"):
+    # Hugging Face model download URL (must be the raw file link)
+    model_url = "https://huggingface.co/Pratpokh/email_spam_classifier/resolve/main/review_classifier.pth"
+
+    # Download the model if not already present
+    if not os.path.exists(model_path):
+        print("Downloading model from Hugging Face...")
+        response = requests.get(model_url)
+        if response.status_code == 200:
+            with open(model_path, "wb") as f:
+                f.write(response.content)
+            print("Download complete.")
+        else:
+            raise RuntimeError(f"Failed to download model. Status code: {response.status_code}")
+
     # Initialize the model with the same configuration as training
     model = GPTModel(BASE_CONFIG)
-    num_classes = 2 # Assuming binary classification as in your notebook
+    num_classes = 2  # Assuming binary classification as in your notebook
     model.out_head = torch.nn.Linear(in_features=BASE_CONFIG["emb_dim"], out_features=num_classes)
 
     # Load the state dictionary
-    model_state_dict = torch.load(model_path, map_location=torch.device('cpu')) # Load to CPU
+    model_state_dict = torch.load(model_path, map_location=torch.device('cpu'))  # Load to CPU
     model.load_state_dict(model_state_dict)
-    model.eval() # Set the model to evaluation mode
+    model.eval()  # Set the model to evaluation mode
+
     return model
 
 # --- Tokenizer Initialization ---
