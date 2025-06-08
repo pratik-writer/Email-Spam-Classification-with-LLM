@@ -3,3 +3,4 @@ torch
 transformers
 scikit-learn
 pandas
+tiktoken
